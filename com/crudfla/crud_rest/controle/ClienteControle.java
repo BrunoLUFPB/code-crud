@@ -1,7 +1,11 @@
 package com.crudfla.crud_rest.controle;
 
+
+
 import java.util.List;
 
+import com.crudfla.crud_rest.modelo.Venda;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +35,20 @@ public class ClienteControle {
 	
 	@Autowired
 	private ClienteServico clienteServico;
+	
+	// Endpoint para obter todas as vendas de um cliente
+    @GetMapping("/{clienteId}/vendas")
+    public ResponseEntity<List<Venda>> obterVendas(@PathVariable Long clienteId) {
+        List<Venda> vendas = clienteServico.obterVendasDoCliente(clienteId);
+        return ResponseEntity.ok(vendas);
+    }
+
+    // Endpoint para obter o valor total das vendas de um cliente
+    @GetMapping("/{clienteId}/total-vendas")
+    public ResponseEntity<Double> calcularTotalVendas(@PathVariable Long clienteId) {
+        Double totalVendas = clienteServico.calcularValorTotalVendas(clienteId);
+        return ResponseEntity.ok(totalVendas);
+    }
 	
 	@Autowired
 	private ClienteMapper clienteMapper;

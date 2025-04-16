@@ -1,111 +1,118 @@
 package com.crudfla.crud_rest.modelo;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+
+import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
-
 public class Cliente {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	private String nome;
-	
-	private String sexo;
-	
-	private Long idade;
-	
-	@Column(nullable = false)
-	private boolean fidelidade;
-	
-	private String cidade;
-	
-	private String tipoConsultoria;
-	
-	@Column(nullable = false, unique = true)
-	private String cpf;
-	
-	private String numeroCelular;
-	
-	public String getCidade() {
-		return cidade;
-	}
 
-	public void setCidade(String cidade) {
-		this.cidade = cidade;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	public String getCpf() {
-		return cpf;
-	}
+    private String nome;
+    private String sexo;
+    private Long idade;
 
-	public void setCpf(String cpf) {
-		this.cpf = cpf;
-	}
+    @Column(nullable = false)
+    private boolean fidelidade;
 
-	public String getNumeroCelular() {
-		return numeroCelular;
-	}
+    private String cidade;
 
-	public void setNumeroCelular(String numeroCelular) {
-		this.numeroCelular = numeroCelular;
-	}
+    @Column(nullable = false, unique = true)
+    private String cpf;
 
-	public void setFidelidade(boolean fidelidade) {
-		this.fidelidade = fidelidade;
-	}
+    private String numeroCelular;  // Verifique se este campo está presente
 
-	public Long getIdade() {
-		return idade;
-	}
+    // Relacionamento One-to-Many com Venda
+    @OneToMany(mappedBy = "cliente")
+    private List<Venda> vendas;
 
-	public void setIdade(Long idade) {
-		this.idade = idade;
-	}
+    // Construtor padrão
+    public Cliente() {}
 
-	public Long getId() {
-		return id;
-	}
+    // Construtor com parâmetros
+    public Cliente(String nome, String sexo, Long idade, boolean fidelidade, String cidade, String cpf, String numeroCelular) {
+        this.nome = nome;
+        this.sexo = sexo;
+        this.idade = idade;
+        this.fidelidade = fidelidade;
+        this.cidade = cidade;
+        this.cpf = cpf;
+        this.numeroCelular = numeroCelular;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    // Getters e Setters
+    public Long getId() {
+        return id;
+    }
 
-	public String getNome() {
-		return nome;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
+    public String getNome() {
+        return nome;
+    }
 
-	public String getSexo() {
-		return sexo;
-	}
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
-	public void setSexo(String sexo) {
-		this.sexo = sexo;
-	}
+    public String getSexo() {
+        return sexo;
+    }
 
-	public Boolean getFidelidade() {
-		return fidelidade;
-	}
+    public void setSexo(String sexo) {
+        this.sexo = sexo;
+    }
 
-	public void setFidelidade(Boolean fidelidade) {
-		this.fidelidade = fidelidade;
-	}
+    public Long getIdade() {
+        return idade;
+    }
 
-	public String getTipoConsultoria() {
-		return tipoConsultoria;
-	}
+    public void setIdade(Long idade) {
+        this.idade = idade;
+    }
 
-	public void setTipoConsultoria(String tipoConsultoria) {
-		this.tipoConsultoria = tipoConsultoria;
-	}
-	
+    // Getter e Setter para fidelidade (booleano)
+    public boolean getFidelidade() {
+        return fidelidade;
+    }
 
+    public void setFidelidade(boolean fidelidade) {
+        this.fidelidade = fidelidade;
+    }
+
+    public String getCidade() {
+        return cidade;
+    }
+
+    public void setCidade(String cidade) {
+        this.cidade = cidade;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public String getNumeroCelular() {
+        return numeroCelular;  // Verifique se o método getNumeroCelular() está presente
+    }
+
+    public void setNumeroCelular(String numeroCelular) {
+        this.numeroCelular = numeroCelular;
+    }
+
+    public List<Venda> getVendas() {
+        return vendas;
+    }
+
+    public void setVendas(List<Venda> vendas) {
+        this.vendas = vendas;
+    }
 }

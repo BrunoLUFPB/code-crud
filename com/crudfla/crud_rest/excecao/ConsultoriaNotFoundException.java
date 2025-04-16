@@ -1,11 +1,14 @@
 package com.crudfla.crud_rest.excecao;
 
-public class ConsultoriaNotFoundException extends Exception {
+public class ConsultoriaNotFoundException extends RuntimeException {
 
-	public ConsultoriaNotFoundException(String message) {
-		super(message);
-		// TODO Auto-generated constructor stub
-	}
+    // Construtor padrão
+    public ConsultoriaNotFoundException(String message) {
+        super(message);
+    }
 
-
+    // Construtor com causa
+    public ConsultoriaNotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

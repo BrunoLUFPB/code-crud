@@ -1,15 +1,8 @@
-package com.crudfla.crud_rest.modelo;
+package com.crudfla.crud_rest.dto;
 
-import jakarta.persistence.*;
-import java.util.List;
+public class ConsultoriaResponseDTO {
 
-@Entity
-public class Consultoria {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String nome;
     private Double preco;
     private Integer estoque;
@@ -17,14 +10,12 @@ public class Consultoria {
     private String categoria;
     private String descricao;
 
-    @ManyToMany(mappedBy = "consultorias")  // Relacionamento Many-to-Many com Venda
-    private List<Venda> vendas;
-
     // Construtor padrão
-    public Consultoria() {}
+    public ConsultoriaResponseDTO() {}
 
     // Construtor com parâmetros
-    public Consultoria(String nome, Double preco, Integer estoque, Long consultor_id, String categoria, String descricao) {
+    public ConsultoriaResponseDTO(Long id, String nome, Double preco, Integer estoque, Long consultor_id, String categoria, String descricao) {
+        this.id = id;
         this.nome = nome;
         this.preco = preco;
         this.estoque = estoque;
@@ -88,13 +79,5 @@ public class Consultoria {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
-    }
-
-    public List<Venda> getVendas() {
-        return vendas;
-    }
-
-    public void setVendas(List<Venda> vendas) {
-        this.vendas = vendas;
     }
 }

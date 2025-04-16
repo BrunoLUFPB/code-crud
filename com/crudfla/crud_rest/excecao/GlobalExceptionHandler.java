@@ -46,13 +46,5 @@ public class GlobalExceptionHandler {
 		return errosMap;
 	}
 	
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	@ExceptionHandler(ConsultoriaNotFoundException.class)
-	public Map<String, String> consultoriaNotFoundException(ConsultoriaNotFoundException ex) {
-		Map<String, String> errosMap = new HashMap<String, String>();
-		errosMap.put("mensagem", ex.getMessage());
-		return errosMap;
-	}
-	
 	
 }

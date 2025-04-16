@@ -3,21 +3,31 @@ package com.crudfla.crud_rest.servico;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.crudfla.crud_rest.excecao.ClienteCpfJaExistenteException;
 import com.crudfla.crud_rest.excecao.ClienteNotFoundException;
 import com.crudfla.crud_rest.modelo.Cliente;
 import com.crudfla.crud_rest.repositorio.ClienteRepositorio;
+import com.crudfla.crud_rest.modelo.Venda;
+
 
 @Service
 public class ClienteServico {
 	
 	@Autowired
 	private ClienteRepositorio clienteRepositorio;
+	
+	// Método para obter todas as vendas de um cliente
+    public List<Venda> obterVendasDoCliente(Long clienteId) {
+        return clienteRepositorio.findByVendasClienteId(clienteId);
+    }
+
+    // Método para calcular o valor total das vendas de um cliente
+    public Double calcularValorTotalVendas(Long clienteId) {
+        List<Venda> vendas = obterVendasDoCliente(clienteId);
+        return vendas.stream().mapToDouble(Venda::getValorTotal).sum();
+    }
 	
     public Cliente gravar(Cliente cliente) throws ClienteCpfJaExistenteException {
         if (clienteRepositorio.existsByCpf(cliente.getCpf())) {

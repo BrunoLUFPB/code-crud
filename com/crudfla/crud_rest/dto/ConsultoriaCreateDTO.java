@@ -1,30 +1,36 @@
-package com.crudfla.crud_rest.modelo;
+package com.crudfla.crud_rest.dto;
 
-import jakarta.persistence.*;
-import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
-@Entity
-public class Consultoria {
+public class ConsultoriaCreateDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @NotBlank(message = "O nome da consultoria é obrigatório.")
     private String nome;
+
+    @NotNull(message = "O preço da consultoria é obrigatório.")
+    @Positive(message = "O preço da consultoria deve ser um valor positivo.")
     private Double preco;
+
+    @NotNull(message = "A quantidade em estoque é obrigatória.")
+    @Positive(message = "O estoque deve ser maior que zero.")
     private Integer estoque;
+
+    @NotNull(message = "O consultor_id é obrigatório.")
     private Long consultor_id;
+
+    @NotBlank(message = "A categoria da consultoria é obrigatória.")
     private String categoria;
+
+    @NotBlank(message = "A descrição da consultoria é obrigatória.")
     private String descricao;
 
-    @ManyToMany(mappedBy = "consultorias")  // Relacionamento Many-to-Many com Venda
-    private List<Venda> vendas;
-
     // Construtor padrão
-    public Consultoria() {}
+    public ConsultoriaCreateDTO() {}
 
     // Construtor com parâmetros
-    public Consultoria(String nome, Double preco, Integer estoque, Long consultor_id, String categoria, String descricao) {
+    public ConsultoriaCreateDTO(String nome, Double preco, Integer estoque, Long consultor_id, String categoria, String descricao) {
         this.nome = nome;
         this.preco = preco;
         this.estoque = estoque;
@@ -34,14 +40,6 @@ public class Consultoria {
     }
 
     // Getters e Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getNome() {
         return nome;
     }
@@ -88,13 +86,5 @@ public class Consultoria {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
-    }
-
-    public List<Venda> getVendas() {
-        return vendas;
-    }
-
-    public void setVendas(List<Venda> vendas) {
-        this.vendas = vendas;
     }
 }

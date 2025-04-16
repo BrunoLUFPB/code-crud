@@ -1,97 +1,86 @@
 package com.crudfla.crud_rest.servico;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
+import com.crudfla.crud_rest.excecao.ConsultoriaNomeJaExistenteException;
+import com.crudfla.crud_rest.excecao.ConsultoriaNotFoundException;
+import com.crudfla.crud_rest.modelo.Consultoria;
+import com.crudfla.crud_rest.repositorio.ConsultoriaRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.crudfla.crud_rest.modelo.Venda;
 
-import com.crudfla.crud_rest.excecao.ClienteCpfJaExistenteException;
-import com.crudfla.crud_rest.excecao.ClienteNotFoundException;
-import com.crudfla.crud_rest.excecao.ConsultoriaNotFoundException;
-import com.crudfla.crud_rest.excecao.ConsultoriaTipoJaExistenteException;
-import com.crudfla.crud_rest.modelo.Cliente;
-import com.crudfla.crud_rest.modelo.Consultoria;
-import com.crudfla.crud_rest.repositorio.ClienteRepositorio;
-import com.crudfla.crud_rest.repositorio.ConsultoriaRepositorio;
-
-import jakarta.persistence.Column;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ConsultoriaServico {
-    
+
     @Autowired
     private ConsultoriaRepositorio consultoriaRepositorio;
     
-    public Consultoria gravarConsultoria(Consultoria consultoria) throws ConsultoriaTipoJaExistenteException {
-        if (consultoriaRepositorio.existsByTipoConsultoria(consultoria.getTipoConsultoria())) {
-            throw new ConsultoriaTipoJaExistenteException("Já existe uma consultoria do tipo: " + consultoria.getTipoConsultoria()); 
-        }
-        return consultoriaRepositorio.save(consultoria);
+ // Método para obter todas as vendas de uma consultoria
+    public List<Venda> obterVendasDaConsultoria(Long consultoriaId) {
+        return consultoriaRepositorio.findByVendasId(consultoriaId);
     }
-    
-    public List<Consultoria> buscarPorIdOuTipo(Long id, String tipoConsultoria) throws ConsultoriaNotFoundException {
-        List<Consultoria> consultorias = new ArrayList<>();
+
+    // Método para calcular o valor total das vendas de uma consultoria
+    public Double calcularValorTotalVendas(Long consultoriaId) {
+        List<Venda> vendas = obterVendasDaConsultoria(consultoriaId);
+        return vendas.stream().mapToDouble(Venda::getValorTotal).sum();
+    }
+
+    // Método para criar uma nova consultoria
+    public Consultoria gravar(Consultoria consultoria) throws ConsultoriaNomeJaExistenteException {
+        if (consultoriaRepositorio.existsByNome(consultoria.getNome())) {
+            throw new ConsultoriaNomeJaExistenteException("Já existe uma consultoria com o nome: " + consultoria.getNome());
+        } else {
+            return consultoriaRepositorio.save(consultoria);
+        }
+    }
+
+    // Método para buscar consultorias por ID ou nome
+    public List<Consultoria> buscarPorIdOuNome(Long id, String nome) throws ConsultoriaNotFoundException {
+        List<Consultoria> consultorias;
         
         if (id != null) {
-            Consultoria consultoria = consultoriaRepositorio.findById(id)
-                .orElseThrow(() -> new ConsultoriaNotFoundException("Consultoria não encontrada."));
-            
-            if (tipoConsultoria != null && !tipoConsultoria.isBlank()) {
-                if (!consultoria.getTipoConsultoria().equalsIgnoreCase(tipoConsultoria)) {
-                    throw new ConsultoriaNotFoundException("Consultoria do ID " + id + " não é do tipo '" + tipoConsultoria + "'");
-                }
+            consultorias = List.of(consultoriaRepositorio.findById(id).orElseThrow(() -> 
+                new ConsultoriaNotFoundException("Consultoria não encontrada com o ID: " + id)));
+        } else if (nome != null && !nome.isBlank()) {
+            consultorias = List.of(consultoriaRepositorio.findByNome(nome));
+            if (consultorias.isEmpty()) {
+                throw new ConsultoriaNotFoundException("Consultoria não encontrada com o nome: " + nome);
             }
-            consultorias.add(consultoria);
-            
-        } else if (tipoConsultoria != null && !tipoConsultoria.isBlank()) {
-            consultorias = consultoriaRepositorio.findByTipoConsultoriaContainingIgnoreCase(tipoConsultoria);
         } else {
             consultorias = consultoriaRepositorio.findAll();
         }
-        
-        if (consultorias.isEmpty()) {
-            throw new ConsultoriaNotFoundException("Nenhuma consultoria encontrada com os critérios informados");
-        }
-        
+
         return consultorias;
     }
-    
+
+    // Método para alterar os dados de uma consultoria existente
     public Consultoria alterarConsultoria(Long id, Consultoria consultoria) 
-            throws ConsultoriaNotFoundException, ConsultoriaTipoJaExistenteException {
+            throws ConsultoriaNotFoundException, ConsultoriaNomeJaExistenteException {
         
-        Consultoria consultoriaGravada = buscarPorIdOuTipo(id, null).get(0);
+        Consultoria consultoriaGravada = buscarPorIdOuNome(id, null).get(0);
+
+        boolean nomeAlterado = !Objects.equals(consultoriaGravada.getNome(), consultoria.getNome());
         
-        if (consultoria.getTipoConsultoria() == null || consultoria.getTipoConsultoria().isBlank()) {
-            throw new IllegalArgumentException("Tipo da consultoria é obrigatório");
+        if (nomeAlterado && consultoriaRepositorio.existsByNome(consultoria.getNome())) {
+            throw new ConsultoriaNomeJaExistenteException("Já existe uma consultoria com o nome: " + consultoria.getNome());
         }
-        
-        boolean tipoAlterado = !Objects.equals(consultoriaGravada.getTipoConsultoria(), consultoria.getTipoConsultoria());
-        
-        if (tipoAlterado) {
-            boolean tipoExistente = consultoriaRepositorio.existsByTipoConsultoriaAndIdNot(
-                consultoria.getTipoConsultoria(), 
-                id
-            );
-            if (tipoExistente) {
-                throw new ConsultoriaTipoJaExistenteException("Tipo de consultoria já está em uso: " + consultoria.getTipoConsultoria());
-            }
-        }
-        
-        // Atualização dos campos
+
+        consultoriaGravada.setNome(consultoria.getNome());
+        consultoriaGravada.setPreco(consultoria.getPreco());
+        consultoriaGravada.setEstoque(consultoria.getEstoque());
+        consultoriaGravada.setConsultor_id(consultoria.getConsultor_id());
+        consultoriaGravada.setCategoria(consultoria.getCategoria());
         consultoriaGravada.setDescricao(consultoria.getDescricao());
-        consultoriaGravada.setDuracaoHoras(consultoria.getDuracaoHoras());
-        consultoriaGravada.setValor(consultoria.getValor());
-        consultoriaGravada.setTipoConsultoria(consultoria.getTipoConsultoria());
-        
+
         return consultoriaRepositorio.save(consultoriaGravada);
     }
 
+    // Método para deletar uma consultoria
     public void apagarConsultoria(Long id) throws ConsultoriaNotFoundException {
-        Consultoria consultoria = consultoriaRepositorio.findById(id)
-            .orElseThrow(() -> new ConsultoriaNotFoundException("Consultoria não encontrada para exclusão"));
+        Consultoria consultoria = buscarPorIdOuNome(id, null).get(0);
         consultoriaRepositorio.delete(consultoria);
     }
 }

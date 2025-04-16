@@ -1,28 +1,20 @@
 package com.crudfla.crud_rest.repositorio;
 
-import com.crudfla.crud_rest.modelo.Consultoria;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import java.util.List;
+import org.springframework.stereotype.Repository;
+import com.crudfla.crud_rest.modelo.Consultoria;
+import com.crudfla.crud_rest.modelo.Venda;
+import java.util.List; 
 
+@Repository
 public interface ConsultoriaRepositorio extends JpaRepository<Consultoria, Long> {
+	
+	// Método para buscar todas as vendas associadas a uma consultoria
+    List<Venda> findByVendasId(Long consultoriaId);
 
-    // Verifica se já existe uma consultoria com o mesmo tipo
-    boolean existsByTipoConsultoria(String tipoConsultoria);
+    // Método para verificar se uma consultoria com o nome já existe
+    boolean existsByNome(String nome);
 
-    // Verifica se outro registro tem o mesmo tipo (exceto o atual)
-    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END " +
-           "FROM Consultoria c " +
-           "WHERE c.tipoConsultoria = :tipo AND c.id <> :id")
-    boolean existsByTipoConsultoriaAndIdNot(
-        @Param("tipo") String tipoConsultoria, 
-        @Param("id") Long id
-    );
-
-    // Busca por correspondência exata (case-sensitive)
-    List<Consultoria> findByTipoConsultoriaContaining(String tipoConsultoria);
-
-    // Busca por correspondência parcial (case-insensitive)
-    List<Consultoria> findByTipoConsultoriaContainingIgnoreCase(String tipoConsultoria);
+    // Método para encontrar uma consultoria pelo nome
+    Consultoria findByNome(String nome);
 }
